@@ -1,6 +1,6 @@
 # i3-esque macOS space indicator & chooser
 
-I missed the workspace choosee from i3 that allows clicking specific spaces and scrolling through spaces with the mouse wheel. This adds that to your macOS menubar. Depends on chunkwm with hardcoded switching tasks in [NSStatusBarButton.swift](https://github.com/pgorsira/chunkwm-i3-space-switcher/blob/master/SpaceId/Application/NSStatusBarButton.swift). You'll need to modify these if you're using something else. If you are using chunkwm I highly recommend [installing the scripting addition](https://koekeishiya.github.io/chunkwm/docs/sa.html) which allows you to switch spaces instantly.
+I missed the workspace chooser from i3 that allows clicking specific spaces and scrolling through spaces with the mouse wheel. This adds that to your macOS menubar. Depends on chunkwm with hardcoded switching tasks in [NSStatusBarButton.swift](https://github.com/pgorsira/chunkwm-i3-space-switcher/blob/master/SpaceId/Application/NSStatusBarButton.swift). You'll need to modify these if you're using something else. If you are using chunkwm I highly recommend [installing the scripting addition](https://koekeishiya.github.io/chunkwm/docs/sa.html) which allows you to switch spaces instantly.
 
 ![](https://raw.githubusercontent.com/dshnkao/SpaceId/master/images/a.png)
 ![](https://raw.githubusercontent.com/dshnkao/SpaceId/master/images/b.png)
