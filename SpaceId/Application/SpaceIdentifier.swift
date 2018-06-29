@@ -9,6 +9,10 @@ class SpaceIdentifier {
     typealias ScreenNumber = String
     typealias ScreenUUID = String
     
+    func getMonitors() -> [[String : Any]]{
+        return (CGSCopyManagedDisplaySpaces(conn) as? [[String : Any]])!
+    }
+    
     func getSpaceInfo() -> SpaceInfo {
         
         guard let monitors = CGSCopyManagedDisplaySpaces(conn) as? [[String : Any]],
@@ -43,7 +47,7 @@ class SpaceIdentifier {
                   let managedSpaceId = current["ManagedSpaceID"] as? Int
             else { continue }
 
-            allSpaces += parseSpaceList(spaces: spaces, startIndex: counter, activeUUID: uuid)
+            allSpaces += parseSpaceList(spaces: spaces, startIndex: counter, activeUUID: uuid, displayIdentifier: displayIdentifier)
             
             let filterFullscreen = spaces.filter{ $0["TileLayoutManager"] as? [String : Any] == nil}
             let target = filterFullscreen.enumerated().first(where: { $1["uuid"] as? String == uuid})
@@ -55,6 +59,7 @@ class SpaceIdentifier {
                                                     managedSpaceId: managedSpaceId,
                                                     number: number,
                                                     order: order,
+                                                    displayIdentifier: displayIdentifier,
                                                     isActive: true)
             spaceCount += spaces.count
             counter += filterFullscreen.count
@@ -63,7 +68,7 @@ class SpaceIdentifier {
         return (activeSpaces, allSpaces)
     }
     
-    private func parseSpaceList(spaces: [[String : Any]], startIndex: Int, activeUUID: String) -> [Space] {
+    private func parseSpaceList(spaces: [[String : Any]], startIndex: Int, activeUUID: String, displayIdentifier:String = "") -> [Space] {
         var ret: [Space] = []
         var counter: Int = startIndex
         for s in spaces {
@@ -81,6 +86,7 @@ class SpaceIdentifier {
                       managedSpaceId: managedSpaceId,
                       number: number,
                       order: 0,
+                      displayIdentifier: displayIdentifier,
                       isActive: uuid == activeUUID))
             if !isFullscreen {
                 counter += 1
