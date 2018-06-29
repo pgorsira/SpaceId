@@ -28,4 +28,11 @@ extension NSStatusBarButton {
             shell("/usr/local/bin/chunkc", "tiling::desktop", "-f", "prev")
         }
     }
+    
+    open override func mouseDown(with: NSEvent) {
+        let index = ((with.locationInWindow.x - 6) / 18) + 1
+        Swift.print(index)
+        shell("/usr/local/bin/chunkc", "tiling::desktop", "-f", String(Int(floor(index))))
+    }
+
 }

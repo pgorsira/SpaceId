@@ -65,7 +65,7 @@ class ButtonImage {
         
         image1.lockFocus()
         color.set()
-        let path = NSBezierPath(roundedRect: rect, xRadius: 3, yRadius: 3)
+        let path = NSBezierPath(roundedRect: rect, xRadius: 0, yRadius: 0)
         path.fill()
         image1.unlockFocus()
         
