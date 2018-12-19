@@ -144,6 +144,7 @@ class SpaceIdentifier {
                     break
                 }
             }
+            fds.deallocate()
         }
         shutdown(sockFD, SHUT_RDWR)
         close(sockFD)
