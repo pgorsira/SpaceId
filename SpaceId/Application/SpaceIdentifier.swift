@@ -14,10 +14,9 @@ class SpaceIdentifier {
     }
     
     func getSpaceInfo() -> SpaceInfo {
-        
         guard let monitors = CGSCopyManagedDisplaySpaces(conn) as? [[String : Any]],
-              let mainDisplay = NSScreen.main(),
-              let screenNumber = mainDisplay.deviceDescription["NSScreenNumber"] as? UInt32
+            let mainDisplay = NSScreen.main,
+              let screenNumber = mainDisplay.deviceDescription[NSDeviceDescriptionKey(rawValue: ("NSScreenNumber"))] as? UInt32
         else { return SpaceInfo(keyboardFocusSpace: nil, activeSpaces: [], allSpaces: []) }
         
         let cfuuid = CGDisplayCreateUUIDFromDisplayID(screenNumber).takeRetainedValue()
