@@ -1,4 +1,4 @@
-README.html
-Dependencies/
-SpaceId.xcodeproj/project.xcworkspace/xcshareddata/
-SpaceId.xcodeproj/xcuserdata/denniskao.xcuserdatad/xcdebugger/
+SpaceId.xcodeproj/project.xcworkspace/
+SpaceId.xcodeproj/xcuserdata
+build
+.DS_Store
