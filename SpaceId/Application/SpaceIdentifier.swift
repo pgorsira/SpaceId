@@ -1,5 +1,4 @@
 import Cocoa
-import Foundation
 
 class SpaceIdentifier {
     
@@ -59,7 +58,8 @@ class SpaceIdentifier {
                                                     number: number,
                                                     order: order,
                                                     displayIdentifier: displayIdentifier,
-                                                    isActive: true)
+                                                    isActive: true,
+                                                    windowCount: 1)
             spaceCount += spaces.count
             counter += filterFullscreen.count
             order += 1
@@ -78,6 +78,7 @@ class SpaceIdentifier {
                   else { continue }
             let isFullscreen = s["TileLayoutManager"] as? [String : Any] == nil ? false : true
             let number: Int? = isFullscreen ? nil : counter
+            let windowCount = number == nil ? 1 : self.windowCount(for: number!)
             ret.append(
                 Space(id64: id64,
                       uuid: uuid,
@@ -86,12 +87,68 @@ class SpaceIdentifier {
                       number: number,
                       order: 0,
                       displayIdentifier: displayIdentifier,
-                      isActive: uuid == activeUUID))
+                      isActive: uuid == activeUUID,
+                      windowCount: windowCount))
             if !isFullscreen {
                 counter += 1
             }
         }
         return ret
     }
+    private func windowCount (for desktop: Int) -> Int {
+        let countString = chunkwmSend(message: "tiling::query --windows-for-desktop \(desktop)")
+        let windows = countString?.split(separator: "\n")
+        return windows?.count ?? 0
+    }
+    
+    private func chunkwmSend (message: String) -> String? {
+        let chunkPort: UInt16 = 3920
+        
+        let sockFD = socket(AF_INET, SOCK_STREAM, 0)
+        if sockFD == -1 {
+            print("Could not create socket!")
+            return nil
+        }
+        
+        guard let server = gethostbyname("localhost".cString(using: .utf8)) else {
+            print("gethostbyname failed for localhost")
+            return nil
+        }
+        var serverAddress = sockaddr_in()
+        serverAddress.sin_family = sa_family_t(AF_INET)
+        serverAddress.sin_port = chunkPort.bigEndian
+        memcpy(&serverAddress.sin_addr.s_addr, server.pointee.h_addr_list[0], Int(server.pointee.h_length))
+        
+        if connect(sockFD, UnsafePointer<sockaddr>(&serverAddress), socklen_t(MemoryLayout<sockaddr>.size)) == -1 {
+            print("chunkc: connection failed!")
+            return nil
+        }
+        
+        let cMessage = message.cString(using: .utf8)
+        let cMessageLength = message.lengthOfBytes(using: .utf8) + 1 // for NULL-termination
+        var response = [Int8](repeating: 0, count: Int(BUFSIZ+1))
+
+        if send(sockFD, cMessage, cMessageLength, 0) == -1 {
+            print("chunkc: failed to send data!")
+        } else {
+            let fds = UnsafeMutablePointer<pollfd>.allocate(capacity: 1)
+            fds.pointee.fd = sockFD
+            fds.pointee.events = Int16(POLLIN)
+            fds.pointee.revents = 0
+            
+            while poll(fds, 2, -1) > 0 {
+                let numBytes = recv(sockFD, &response, Int(BUFSIZ), 0)
+                if numBytes > 0 {
+                    response[numBytes] = 0
+                } else {
+                    break
+                }
+            }
+        }
+        shutdown(sockFD, SHUT_RDWR)
+        close(sockFD)
+        return String(cString: &response, encoding: .utf8)
+    }
+    
 }
 

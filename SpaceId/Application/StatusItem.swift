@@ -16,8 +16,11 @@ class StatusItem: NSObject, NSMenuDelegate {
     }
     
     func updateMenuImage(spaceInfo: SpaceInfo) {
-        currentSpaceInfo = spaceInfo
-        item.button?.image = buttonImage.createImage(spaceInfo: spaceInfo)
+        let image = buttonImage.createImage(spaceInfo: spaceInfo)
+        DispatchQueue.main.async {
+            self.currentSpaceInfo = spaceInfo
+            self.item.button?.image = image
+        }
     }
     
     private func menuItems() -> NSMenu {

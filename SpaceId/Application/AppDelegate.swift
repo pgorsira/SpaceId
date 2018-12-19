@@ -27,8 +27,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, ReloadDelegate {
     
     private func updateSpaceNumber(_ : Any) {
         usleep(10000)
-        let info = spaceIdentifier.getSpaceInfo()
-        statusItem.updateMenuImage(spaceInfo: info)
+        DispatchQueue.global(qos: .background).async {
+            let info = self.spaceIdentifier.getSpaceInfo()
+            self.statusItem.updateMenuImage(spaceInfo: info)
+        }
     }
     
     private func setLoginItem() {

@@ -82,7 +82,8 @@ class ButtonImage {
         return image
     }
     
-    private func combine(icons: [NSImage], count: Int) -> NSImage {
+    private func combine(icons: [NSImage]) -> NSImage {
+        let count = icons.count
         let width = size.width * CGFloat(count) + CGFloat(2 * (count - 1))
         let image = NSImage(size: CGSize(width: width, height: size.height))
         image.lockFocus()
@@ -103,14 +104,17 @@ class ButtonImage {
     private func perMonitor(spaceInfo:SpaceInfo, color: Preference.Color) -> NSImage {
         let spaces = spaceInfo.activeSpaces.sorted{ $0.order < $1.order }
         let icons = spaces.map { colorF(color: color)(getTextForSpace(space: $0), 1) }
-        return combine(icons: icons, count: spaces.count)
+        return combine(icons: icons)
     }
     
     private func perSpace(spaceInfo: SpaceInfo, color: Preference.Color) -> NSImage {
-        let icons = spaceInfo.allSpaces.map {
-            colorF(color: color)(getTextForSpace(space: $0), getAlpha(space: $0))
+        let icons = spaceInfo.allSpaces.compactMap { space -> (NSImage?) in
+            if !space.isActive && space.windowCount == 0 {
+                return nil
+            }
+            return colorF(color: color)(getTextForSpace(space: space), getAlpha(space: space))
         }
-        return combine(icons: icons, count: spaceInfo.allSpaces.count)
+        return combine(icons: icons)
     }
     
     private func getAlpha(space: Space) -> CGFloat {

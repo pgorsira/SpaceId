@@ -9,4 +9,5 @@ struct Space {
     let order: Int              // spaces are in order including fullscreen apps
     let displayIdentifier: String?
     let isActive: Bool
+    let windowCount: Int
 }
