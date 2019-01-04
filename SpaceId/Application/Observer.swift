@@ -1,10 +1,9 @@
 import Cocoa
-import Foundation
 
 class Observer {
     
     let defaults = UserDefaults.standard
-    let center = NSWorkspace.shared().notificationCenter
+    let center = NSWorkspace.shared.notificationCenter
     var workspace = false
     var monitor = false
     var activeApp: NSObjectProtocol?
@@ -32,7 +31,7 @@ class Observer {
     
     private func addActiveWorkSpaceEvent(using: @escaping (Notification) -> Void) {
         center.addObserver(
-                forName: NSNotification.Name.NSWorkspaceActiveSpaceDidChange,
+            forName: NSWorkspace.activeSpaceDidChangeNotification,
                 object: nil,
                 queue: OperationQueue.main,
                 using: using)
@@ -40,7 +39,7 @@ class Observer {
     
     private func addMonitorEvent(using: @escaping (Notification) -> Void) {
         center.addObserver(
-            forName: NSNotification.Name.NSApplicationDidChangeScreenParameters,
+            forName: NSApplication.didChangeScreenParametersNotification,
             object: nil,
             queue: OperationQueue.main,
             using: using)
@@ -48,19 +47,19 @@ class Observer {
     
     private func addActiveApplicationEvent(using: @escaping (Notification) -> Void) {
         activeApp = center.addObserver(
-                forName: NSNotification.Name.NSWorkspaceDidActivateApplication,
+            forName: NSWorkspace.didActivateApplicationNotification,
                 object: nil,
                 queue: OperationQueue.main, using: using)
     }
     
     private func addLeftMouseClickEvent(handler: @escaping (NSEvent) -> Void) {
-        leftMouseClick = NSEvent.addGlobalMonitorForEvents(matching: NSEventMask.leftMouseDown, handler: handler)
+        leftMouseClick = NSEvent.addGlobalMonitorForEvents(matching: NSEvent.EventTypeMask.leftMouseDown, handler: handler)
     }
     
     private func removeActiveApplicationEvent() {
         if let observer = activeApp {
             center.removeObserver(observer,
-                                  name: NSNotification.Name.NSWorkspaceDidActivateApplication,
+                                  name: NSWorkspace.activeSpaceDidChangeNotification,
                                   object: nil)
             activeApp = nil
         }

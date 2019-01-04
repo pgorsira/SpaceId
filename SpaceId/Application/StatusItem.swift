@@ -4,7 +4,7 @@ import ServiceManagement
 
 class StatusItem: NSObject, NSMenuDelegate {
     
-    private let item = NSStatusBar.system().statusItem(withLength: NSVariableStatusItemLength)
+    private let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private let defaults = UserDefaults.standard
     private let buttonImage = ButtonImage()
     private var currentSpaceInfo = SpaceInfo(keyboardFocusSpace: nil, activeSpaces: [], allSpaces: [])
@@ -16,8 +16,11 @@ class StatusItem: NSObject, NSMenuDelegate {
     }
     
     func updateMenuImage(spaceInfo: SpaceInfo) {
-        currentSpaceInfo = spaceInfo
-        item.button?.image = buttonImage.createImage(spaceInfo: spaceInfo)
+        let image = buttonImage.createImage(spaceInfo: spaceInfo)
+        DispatchQueue.main.async {
+            self.currentSpaceInfo = spaceInfo
+            self.item.button?.image = image
+        }
     }
     
     private func menuItems() -> NSMenu {
@@ -67,19 +70,19 @@ class StatusItem: NSObject, NSMenuDelegate {
         launchLogin.target = self
         
         switch defaults.integer(forKey: Preference.icon) {
-        case 0: oneIcon.state = NSOnState
-        case 1: perMonitor.state = NSOnState
-        case 2: perSpace.state = NSOnState
+        case 0: oneIcon.state = .on
+        case 1: perMonitor.state = .on
+        case 2: perSpace.state = .on
         default: break
         }
         
         switch defaults.integer(forKey: Preference.color) {
-        case 0: fill.state = NSOnState
-        case 1: empty.state = NSOnState
+        case 0: fill.state = .on
+        case 1: empty.state = .on
         default: break
         }
         
-        launchLogin.state = defaults.bool(forKey: Preference.App.launchOnLogin.rawValue) ? NSOnState : NSOffState
+        launchLogin.state = defaults.bool(forKey: Preference.App.launchOnLogin.rawValue) ? .on : .off
         
         menu.addItem(launchLogin)
         menu.addItem(NSMenuItem.separator())
@@ -105,10 +108,9 @@ class StatusItem: NSObject, NSMenuDelegate {
         leftClick.target = self
         appSwitch.target = self
         
-        leftClick.state = defaults.bool(forKey: Preference.App.updateOnLeftClick.rawValue) ? NSOnState : NSOffState
-        appSwitch.state = defaults.bool(forKey: Preference.App.updateOnAppSwitch.rawValue) ? NSOnState : NSOffState
+        leftClick.state = defaults.bool(forKey: Preference.App.updateOnLeftClick.rawValue) ? .on : .off
+        appSwitch.state = defaults.bool(forKey: Preference.App.updateOnAppSwitch.rawValue) ? .on : .off
         
-
         menu.addItem(NSMenuItem(title: "Enhance Multi Monitor Support", action: nil, keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(leftClick)
@@ -116,55 +118,55 @@ class StatusItem: NSObject, NSMenuDelegate {
         return menu
     }
     
-    func oneIcon(_ sender: NSMenuItem) {
+    @objc func oneIcon(_ sender: NSMenuItem) {
         defaults.set(Preference.Icon.one.rawValue, forKey: Preference.icon)
         createMenu()
         updateMenuImage(spaceInfo: currentSpaceInfo)
     }
     
-    func iconPerMonitor(_ sender: NSMenuItem) {
+    @objc func iconPerMonitor(_ sender: NSMenuItem) {
         defaults.set(Preference.Icon.perMonitor.rawValue, forKey: Preference.icon)
         createMenu()
         updateMenuImage(spaceInfo: currentSpaceInfo)
     }
     
-    func iconPerSpace(_ sender: NSMenuItem) {
+    @objc func iconPerSpace(_ sender: NSMenuItem) {
         defaults.set(Preference.Icon.perSpace.rawValue, forKey: Preference.icon)
         createMenu()
         updateMenuImage(spaceInfo: currentSpaceInfo)
     }
     
-    func whiteOnBlack(_ sender: NSMenuItem) {
+    @objc func whiteOnBlack(_ sender: NSMenuItem) {
         defaults.set(Preference.Color.whiteOnBlack.rawValue, forKey: Preference.color)
         createMenu()
         updateMenuImage(spaceInfo: currentSpaceInfo)
     }
     
-    func blackOnWhite(_ sender: NSMenuItem) {
+    @objc func blackOnWhite(_ sender: NSMenuItem) {
         defaults.set(Preference.Color.blackOnWhite.rawValue, forKey: Preference.color)
         createMenu()
         updateMenuImage(spaceInfo: currentSpaceInfo)
     }
     
-    func updateOnLeftClick(_ sender: NSMenuItem) {
+    @objc func updateOnLeftClick(_ sender: NSMenuItem) {
         let b = defaults.bool(forKey: Preference.App.updateOnLeftClick.rawValue)
         defaults.set(!b, forKey: Preference.App.updateOnLeftClick.rawValue)
         delegate?.reload()
     }
 
-    func updateOnAppSwitch(_ sender: NSMenuItem) {
+    @objc func updateOnAppSwitch(_ sender: NSMenuItem) {
         let b = defaults.bool(forKey: Preference.App.updateOnAppSwitch.rawValue)
         defaults.set(!b, forKey: Preference.App.updateOnAppSwitch.rawValue)
         delegate?.reload()
     }
     
-    func launchOnLogin(_ sender: NSMenuItem) {
+    @objc func launchOnLogin(_ sender: NSMenuItem) {
         let b = !defaults.bool(forKey: Preference.App.launchOnLogin.rawValue)
         defaults.set(b, forKey: Preference.App.launchOnLogin.rawValue)
         delegate?.reload()
     }
 
-    func quit(_ sender: NSMenuItem) {
+    @objc func quit(_ sender: NSMenuItem) {
         NSApp.terminate(self)
     }
     
